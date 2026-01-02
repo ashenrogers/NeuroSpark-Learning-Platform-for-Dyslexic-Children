@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // Change this to your backend URL
-  static const String baseUrl = 'http://10.143.185.33:8000'; // Laptop IP
+  static const String baseUrl = 'http://10.143.185.7:8000'; // Laptop IP
   // For Android emulator, use: 'http://10.0.2.2:8000'
   
   final Dio _dio = Dio(

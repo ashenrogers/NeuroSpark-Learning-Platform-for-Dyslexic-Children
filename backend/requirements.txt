@@ -15,6 +15,9 @@ openai-whisper==20231117
 torch==2.1.2
 transformers==4.37.0
 
+# Wav2Vec2 for Pronunciation
+torchaudio==2.1.2
+
 # NLP & Text Processing
 nltk==3.8.1
 Levenshtein==0.23.0

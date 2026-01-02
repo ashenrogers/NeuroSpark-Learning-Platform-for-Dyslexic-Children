@@ -1,14 +1,23 @@
 import Levenshtein
 import re
 from typing import Dict
+from .wav2vec2_pronunciation_checker import Wav2Vec2PronunciationChecker
 
 class PronunciationChecker:
     """
-    Checks pronunciation of individual words.
+    Enhanced pronunciation checker using Wav2Vec2 for phoneme-level analysis.
+    Combines traditional methods with advanced Wav2Vec2 model for industry-standard accuracy.
     """
     
     def __init__(self, speech_model):
         self.speech_model = speech_model
+        # Initialize Wav2Vec2 for advanced pronunciation analysis
+        try:
+            self.wav2vec2_checker = Wav2Vec2PronunciationChecker()
+            print("Wav2Vec2 pronunciation checker initialized successfully!")
+        except Exception as e:
+            print(f"Wav2Vec2 not available, falling back to traditional methods: {e}")
+            self.wav2vec2_checker = None
     
     def normalize_word(self, word: str) -> str:
         """Normalize word for comparison."""
@@ -49,18 +58,38 @@ class PronunciationChecker:
     
     def check_pronunciation(self, audio_path: str, word: str) -> Dict:
         """
-        Check pronunciation of a single word.
+        Check pronunciation using Wav2Vec2 for phoneme-level analysis.
         
         Args:
             audio_path: Path to the audio file
             word: The word that should have been pronounced
             
         Returns:
-            Dictionary containing:
-            - is_correct: Boolean indicating if pronunciation is correct
-            - confidence: Confidence score (0-1)
-            - transcription: What the user said
-            - expected: The word that was expected
+            Dictionary containing comprehensive pronunciation analysis
+        """
+        # Use Wav2Vec2 if available (preferred method)
+        if self.wav2vec2_checker:
+            try:
+                result = self.wav2vec2_checker.check_pronunciation(audio_path, word)
+                # Add fallback info
+                result["analysis_method"] = "Wav2Vec2 (phoneme-level)"
+                return result
+            except Exception as e:
+                print(f"Wav2Vec2 failed, falling back to traditional method: {e}")
+        
+        # Fallback to traditional method
+        return self._traditional_pronunciation_check(audio_path, word)
+    
+    def _traditional_pronunciation_check(self, audio_path: str, word: str) -> Dict:
+        """
+        Traditional pronunciation checking method (fallback).
+        
+        Args:
+            audio_path: Path to the audio file
+            word: The word that should have been pronounced
+            
+        Returns:
+            Dictionary with pronunciation analysis using traditional methods
         """
         # Transcribe the audio with confidence
         result = self.speech_model.transcribe_with_confidence(audio_path)
@@ -73,6 +102,7 @@ class PronunciationChecker:
                 "confidence": 0.0,
                 "transcription": "",
                 "expected": word,
+                "analysis_method": "Traditional (text-based)",
                 "error": "Could not transcribe audio. Please try again."
             }
         
@@ -91,5 +121,6 @@ class PronunciationChecker:
             "confidence": round(final_confidence, 2),
             "transcription": transcription,
             "expected": word,
-            "accuracy": round(accuracy, 2)
+            "accuracy": round(accuracy, 2),
+            "analysis_method": "Traditional (text-based)"
         }
