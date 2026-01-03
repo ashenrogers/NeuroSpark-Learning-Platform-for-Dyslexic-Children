@@ -94,6 +94,10 @@ class _PronunciationGameScreenState extends State<PronunciationGameScreen> {
 
       final isCorrect = response['is_correct'] ?? false;
       final confidence = response['confidence'] ?? 0.0;
+      final transcription = response['transcription'] ?? '';
+      final analysisMethod = response['analysis_method'] ?? 'Unknown';
+      final phonemeAccuracy = response['phoneme_accuracy'] ?? 0.0;
+      final modelUsed = response['model_used'] ?? 'Unknown';
 
       setState(() => _totalAttempts++);
 
@@ -108,7 +112,13 @@ class _PronunciationGameScreenState extends State<PronunciationGameScreen> {
           message: isCorrect
               ? 'Perfect pronunciation!'
               : 'Try again! Your pronunciation needs improvement.',
-          details: 'Confidence: ${(confidence * 100).toStringAsFixed(1)}%',
+          details: _buildPronunciationDetails(
+            confidence,
+            transcription,
+            analysisMethod,
+            phonemeAccuracy,
+            modelUsed,
+          ),
           onContinue: () {
             Navigator.pop(context);
             _nextWord();
@@ -120,6 +130,29 @@ class _PronunciationGameScreenState extends State<PronunciationGameScreen> {
     } finally {
       setState(() => _isProcessing = false);
     }
+  }
+
+  String _buildPronunciationDetails(
+    double confidence,
+    String transcription,
+    String analysisMethod,
+    double phonemeAccuracy,
+    String modelUsed,
+  ) {
+    String details = 'Overall Confidence: ${(confidence * 100).toStringAsFixed(1)}%\n\n';
+    
+    if (transcription.isNotEmpty) {
+      details += '🎤 What you said: "$transcription"\n\n';
+    }
+    
+    if (phonemeAccuracy > 0) {
+      details += '🔊 Phoneme Accuracy: ${(phonemeAccuracy * 100).toStringAsFixed(1)}%\n\n';
+    }
+    
+    details += '🧠 Analysis Method: $analysisMethod\n';
+    details += '🤖 Model Used: $modelUsed';
+    
+    return details;
   }
 
   void _nextWord() {
