@@ -1,11 +1,49 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
   // Change this to your backend URL
-  static const String baseUrl = 'http://10.143.185.136:8000'; // Laptop IP
+  static String baseUrl = 'http://10.143.185.56:8000'; // Laptop IP
   // For Android emulator, use: 'http://10.0.2.2:8000'
+  
+  // Method to update base URL dynamically
+  static void updateBaseUrl(String newBaseUrl) {
+    baseUrl = newBaseUrl;
+  }
+  
+  // Method to get current base URL
+  static String getCurrentBaseUrl() {
+    return baseUrl;
+  }
+  
+  // Auto-detect and update base URL on initialization
+  static Future<void> initializeAutoDetection() async {
+    try {
+      // Try common local IP addresses
+      final commonIps = [
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+        'http://10.0.2.2:8000', // Android emulator
+      ];
+      
+      for (final ip in commonIps) {
+        try {
+          final response = await http.get(Uri.parse('$ip/health'));
+          if (response.statusCode == 200) {
+            updateBaseUrl(ip);
+            debugPrint('Auto-detected backend URL: $ip');
+            break;
+          }
+        } catch (e) {
+          continue; // Try next IP
+        }
+      }
+    } catch (e) {
+      debugPrint('Auto-detection failed, using default URL: $baseUrl');
+    }
+  }
   
   final Dio _dio = Dio(
     BaseOptions(
