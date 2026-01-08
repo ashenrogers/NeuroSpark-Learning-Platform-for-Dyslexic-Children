@@ -124,25 +124,38 @@ async def check_pronunciation(
 async def get_vocabulary_question(difficulty: str = "easy"):
     """
     Generate an AI-powered vocabulary question.
-    
+
     Returns:
     - question_id: Unique identifier for the question
     - question: The question text
     - options: List of answer options
+    - question_type: Type of question (context, confusing_pair, etc.)
+    - sentence_context: Full sentence for audio support (if available)
+    - target_word: The word being tested (if available)
     """
     try:
         question_data = vocabulary_generator.generate_question(difficulty)
         question_id = str(uuid.uuid4())
-        
+
         # Store the question with its correct answer
         active_questions[question_id] = question_data
-        
-        return {
+
+        # Build response with additional context for audio support
+        response = {
             "question_id": question_id,
             "question": question_data["question"],
-            "options": question_data["options"]
+            "options": question_data["options"],
+            "question_type": question_data.get("question_type", "standard"),
         }
-        
+
+        # Add optional fields for context-based questions
+        if "sentence_context" in question_data:
+            response["sentence_context"] = question_data["sentence_context"]
+        if "target_word" in question_data:
+            response["target_word"] = question_data["target_word"]
+
+        return response
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating question: {str(e)}")
 

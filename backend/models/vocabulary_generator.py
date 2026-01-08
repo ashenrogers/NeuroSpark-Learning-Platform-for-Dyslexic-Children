@@ -4,107 +4,202 @@ from typing import Dict, List
 class VocabularyGenerator:
     """
     Generates vocabulary questions with multiple choice answers.
-    In a production environment, this would integrate with an LLM API like OpenAI or Claude.
-    For this demo, we use a pre-defined question bank.
+    Features context-based questions, confusing word pairs, and audio support.
+    Organized into progressive difficulty levels for adaptive learning.
     """
-    
+
     def __init__(self):
-        # Question bank organized by difficulty
+        # Question bank organized by difficulty with context-based and confusing word pairs
         self.question_bank = {
             "easy": [
+                # Simple common words with context
                 {
-                    "question": "What is the meaning of 'happy'?",
-                    "options": ["Feeling joy", "Feeling sad", "Feeling angry", "Feeling tired"],
-                    "correct_answer": "Feeling joy",
-                    "explanation": "Happy means feeling pleasure and contentment."
+                    "question": "The cat is sleeping on the _____.",
+                    "sentence_context": "The cat is sleeping on the bed.",
+                    "target_word": "bed",
+                    "options": ["🛏️ a place to sleep", "🍕 a food", "🚗 a vehicle", "📚 a book"],
+                    "correct_answer": "🛏️ a place to sleep",
+                    "explanation": "A bed is furniture that we sleep on. Cats love to sleep on soft, cozy places!",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What does 'big' mean?",
-                    "options": ["Large in size", "Small in size", "Medium size", "No size"],
-                    "correct_answer": "Large in size",
-                    "explanation": "Big means of considerable size or extent."
+                    "question": "My dog likes to _____ in the park.",
+                    "sentence_context": "My dog likes to run in the park.",
+                    "target_word": "run",
+                    "options": ["🏃 move fast", "🛌 sleep", "🍽️ eat", "📖 read"],
+                    "correct_answer": "🏃 move fast",
+                    "explanation": "Run means to move quickly using your legs. Dogs love to run and play!",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What is a 'friend'?",
-                    "options": ["Someone you know and like", "A stranger", "An enemy", "A teacher"],
-                    "correct_answer": "Someone you know and like",
-                    "explanation": "A friend is a person with whom you have a bond of mutual affection."
+                    "question": "The sun is very _____ today.",
+                    "sentence_context": "The sun is very bright today.",
+                    "target_word": "bright",
+                    "options": ["☀️ shining with light", "🌙 dark", "❄️ cold", "🌧️ rainy"],
+                    "correct_answer": "☀️ shining with light",
+                    "explanation": "Bright means full of light. The sun gives us bright light during the day!",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What does 'fast' mean?",
-                    "options": ["Moving quickly", "Moving slowly", "Not moving", "Moving backwards"],
-                    "correct_answer": "Moving quickly",
-                    "explanation": "Fast means moving or capable of moving at high speed."
+                    "question": "I like to _____ my favorite book.",
+                    "sentence_context": "I like to read my favorite book.",
+                    "target_word": "read",
+                    "options": ["📖 look at words and understand", "✍️ write words", "🎨 draw pictures", "🎵 sing songs"],
+                    "correct_answer": "📖 look at words and understand",
+                    "explanation": "Reading means looking at words and understanding their meaning. Books are fun to read!",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What is 'water'?",
-                    "options": ["A clear liquid we drink", "A solid food", "A type of air", "A color"],
-                    "correct_answer": "A clear liquid we drink",
-                    "explanation": "Water is a clear liquid that is essential for life."
+                    "question": "Mom made a _____ cake for my birthday.",
+                    "sentence_context": "Mom made a big cake for my birthday.",
+                    "target_word": "big",
+                    "options": ["📏 large in size", "🔍 tiny", "🎨 colorful", "🍰 sweet"],
+                    "correct_answer": "📏 large in size",
+                    "explanation": "Big means large in size. A big cake can feed many people at a party!",
+                    "question_type": "context"
+                },
+                # Simple confusing pairs
+                {
+                    "question": "Choose the correct word: I _____ a new toy yesterday.",
+                    "confusing_pair": ["see", "saw"],
+                    "options": ["see", "saw"],
+                    "correct_answer": "saw",
+                    "explanation": "We use 'saw' when talking about the past. 'Yesterday' tells us it happened before, so we say 'saw'!",
+                    "question_type": "confusing_pair"
+                },
+                {
+                    "question": "Choose the correct word: Can you _____ me the book?",
+                    "confusing_pair": ["give", "gave"],
+                    "options": ["give", "gave"],
+                    "correct_answer": "give",
+                    "explanation": "We use 'give' when asking someone to do something now. 'Can you' means right now!",
+                    "question_type": "confusing_pair"
                 },
             ],
             "medium": [
+                # Academic words with context
                 {
-                    "question": "What does 'curious' mean?",
-                    "options": ["Eager to learn", "Not interested", "Sleepy", "Hungry"],
-                    "correct_answer": "Eager to learn",
-                    "explanation": "Curious means having a desire to learn or know about something."
+                    "question": "Scientists need to _____ the results carefully.",
+                    "sentence_context": "Scientists need to examine the results carefully.",
+                    "target_word": "examine",
+                    "options": ["🔬 look at closely and study", "🏃 run away from", "😴 ignore", "🎨 paint"],
+                    "correct_answer": "🔬 look at closely and study",
+                    "explanation": "Examine means to look at something very carefully to understand it better.",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What is 'courage'?",
-                    "options": ["Bravery in facing danger", "Being afraid", "Running away", "Hiding"],
-                    "correct_answer": "Bravery in facing danger",
-                    "explanation": "Courage is the ability to do something that frightens you."
+                    "question": "Please _____ why you chose that answer.",
+                    "sentence_context": "Please explain why you chose that answer.",
+                    "target_word": "explain",
+                    "options": ["💬 make something clear", "🤫 keep it secret", "❌ refuse to answer", "🎮 play a game"],
+                    "correct_answer": "💬 make something clear",
+                    "explanation": "Explain means to make something easier to understand by giving details.",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What does 'ancient' mean?",
-                    "options": ["Very old", "Brand new", "Medium aged", "Future"],
-                    "correct_answer": "Very old",
-                    "explanation": "Ancient means belonging to the very distant past."
+                    "question": "Let's _____ these two stories.",
+                    "sentence_context": "Let's compare these two stories.",
+                    "target_word": "compare",
+                    "options": ["🔄 see how they are alike or different", "📝 write a new story", "🎭 act them out", "🗑️ throw them away"],
+                    "correct_answer": "🔄 see how they are alike or different",
+                    "explanation": "Compare means to look at two things and see what is the same or different about them.",
+                    "question_type": "context"
+                },
+                # Medium confusing pairs
+                {
+                    "question": "Choose the correct word: _____ going to the movies tonight.",
+                    "confusing_pair": ["their", "there", "they're"],
+                    "options": ["Their", "There", "They're"],
+                    "correct_answer": "They're",
+                    "explanation": "'They're' is short for 'they are'. 'Their' shows ownership, and 'there' is a place.",
+                    "question_type": "confusing_pair"
                 },
                 {
-                    "question": "What is 'harmony'?",
-                    "options": ["Things working well together", "Conflict", "Noise", "Silence"],
-                    "correct_answer": "Things working well together",
-                    "explanation": "Harmony is a pleasing arrangement or agreement."
+                    "question": "Choose the correct word: Put the book over _____.",
+                    "confusing_pair": ["their", "there", "they're"],
+                    "options": ["their", "there", "they're"],
+                    "correct_answer": "there",
+                    "explanation": "'There' tells us about a place or location. 'Their' shows ownership, and 'they're' means 'they are'.",
+                    "question_type": "confusing_pair"
                 },
                 {
-                    "question": "What does 'grateful' mean?",
-                    "options": ["Feeling thankful", "Feeling angry", "Feeling bored", "Feeling scared"],
-                    "correct_answer": "Feeling thankful",
-                    "explanation": "Grateful means feeling or showing appreciation for something."
+                    "question": "Choose the correct word: The loud music will _____ my concentration.",
+                    "confusing_pair": ["affect", "effect"],
+                    "options": ["affect", "effect"],
+                    "correct_answer": "affect",
+                    "explanation": "'Affect' is an action (a verb) - it means to influence something. 'Effect' is the result (a noun).",
+                    "question_type": "confusing_pair"
+                },
+                {
+                    "question": "Choose the correct word: Please _____ my apology.",
+                    "confusing_pair": ["accept", "except"],
+                    "options": ["accept", "except"],
+                    "correct_answer": "accept",
+                    "explanation": "'Accept' means to receive or agree to something. 'Except' means leaving something out.",
+                    "question_type": "confusing_pair"
                 },
             ],
             "hard": [
+                # Complex academic words with context
                 {
-                    "question": "What does 'perseverance' mean?",
-                    "options": ["Continuing despite difficulties", "Giving up easily", "Being lazy", "Avoiding work"],
-                    "correct_answer": "Continuing despite difficulties",
-                    "explanation": "Perseverance means persistence in doing something despite difficulty."
+                    "question": "The athlete showed great _____ by continuing to train despite the injury.",
+                    "sentence_context": "The athlete showed great perseverance by continuing to train despite the injury.",
+                    "target_word": "perseverance",
+                    "options": ["💪 continuing despite difficulties", "😢 giving up easily", "😴 being lazy", "🏃 running fast"],
+                    "correct_answer": "💪 continuing despite difficulties",
+                    "explanation": "Perseverance means continuing to work hard even when things are difficult or challenging.",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What is 'empathy'?",
-                    "options": ["Understanding others' feelings", "Ignoring others", "Being selfish", "Being cruel"],
-                    "correct_answer": "Understanding others' feelings",
-                    "explanation": "Empathy is the ability to understand and share the feelings of another."
+                    "question": "Good teachers show _____ when students struggle.",
+                    "sentence_context": "Good teachers show empathy when students struggle.",
+                    "target_word": "empathy",
+                    "options": ["❤️ understanding others' feelings", "😠 getting angry", "🤷 not caring", "😴 being tired"],
+                    "correct_answer": "❤️ understanding others' feelings",
+                    "explanation": "Empathy means understanding and sharing the feelings of another person.",
+                    "question_type": "context"
                 },
                 {
-                    "question": "What does 'profound' mean?",
-                    "options": ["Very deep or intense", "Shallow", "Simple", "Ordinary"],
-                    "correct_answer": "Very deep or intense",
-                    "explanation": "Profound means having deep insight or great significance."
+                    "question": "The poem had a _____ meaning that made us think deeply.",
+                    "sentence_context": "The poem had a profound meaning that made us think deeply.",
+                    "target_word": "profound",
+                    "options": ["🧠 very deep or intense", "😐 simple", "🤔 confusing", "📄 short"],
+                    "correct_answer": "🧠 very deep or intense",
+                    "explanation": "Profound means having deep meaning or great importance that makes you think carefully.",
+                    "question_type": "context"
+                },
+                # Advanced confusing pairs
+                {
+                    "question": "Choose the correct word: The new policy will have a positive _____ on students.",
+                    "confusing_pair": ["affect", "effect"],
+                    "options": ["affect", "effect"],
+                    "correct_answer": "effect",
+                    "explanation": "'Effect' is a noun meaning the result of something. 'Affect' is a verb meaning to influence.",
+                    "question_type": "confusing_pair"
                 },
                 {
-                    "question": "What is 'resilience'?",
-                    "options": ["Ability to recover from difficulties", "Weakness", "Fragility", "Confusion"],
-                    "correct_answer": "Ability to recover from difficulties",
-                    "explanation": "Resilience is the capacity to recover quickly from difficulties."
+                    "question": "Choose the correct word: Everyone is invited _____ John.",
+                    "confusing_pair": ["accept", "except"],
+                    "options": ["accept", "except"],
+                    "correct_answer": "except",
+                    "explanation": "'Except' means excluding or leaving out. 'Accept' means to receive willingly.",
+                    "question_type": "confusing_pair"
                 },
                 {
-                    "question": "What does 'eloquent' mean?",
-                    "options": ["Speaking fluently and persuasively", "Unable to speak", "Speaking rudely", "Whispering"],
-                    "correct_answer": "Speaking fluently and persuasively",
-                    "explanation": "Eloquent means fluent or persuasive in speaking or writing."
+                    "question": "Choose the correct word: Please be _____ in the library.",
+                    "confusing_pair": ["quiet", "quite"],
+                    "options": ["quiet", "quite"],
+                    "correct_answer": "quiet",
+                    "explanation": "'Quiet' means making little noise. 'Quite' means very or completely.",
+                    "question_type": "confusing_pair"
+                },
+                {
+                    "question": "Choose the correct word: I can't _____ the noise anymore.",
+                    "confusing_pair": ["bear", "bare"],
+                    "options": ["bear", "bare"],
+                    "correct_answer": "bear",
+                    "explanation": "'Bear' means to tolerate or endure. 'Bare' means uncovered or empty.",
+                    "question_type": "confusing_pair"
                 },
             ]
         }
