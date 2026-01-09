@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // Change this to your backend URL
-  static String baseUrl = 'http://10.143.185.173:8000'; // Laptop IP
+  static String baseUrl = 'http://10.143.185.242:8000'; // Laptop IP
   // For Android emulator, use: 'http://10.0.2.2:8000'
   
   // Method to update base URL dynamically

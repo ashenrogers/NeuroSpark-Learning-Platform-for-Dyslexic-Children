@@ -25,14 +25,14 @@ class _FluencyGameScreenState extends State<FluencyGameScreen>
 
   // Sample sentences for practice
   final List<String> _sentences = [
-    'The quick brown fox jumps over the lazy dog.',
     'Reading helps us learn new things every day.',
+    'My favorite story is about a brave little mouse.',
     'I love to play with my friends at school.',
     'The sun shines bright in the clear blue sky.',
     'Practice makes perfect when learning to read.',
     'Every child can learn to read with practice.',
     'Books open doors to wonderful new worlds.',
-    'My favorite story is about a brave little mouse.',
+    'Listening carefully helps improve pronunciation.',
   ];
 
   int _currentSentenceIndex = 0;
