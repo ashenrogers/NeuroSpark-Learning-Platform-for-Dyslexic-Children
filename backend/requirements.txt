@@ -1,0 +1,27 @@
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+pydantic==2.5.3
+python-dotenv==1.0.0
+
+# Speech Recognition & Audio
+SpeechRecognition==3.10.1
+pydub==0.25.1
+librosa==0.10.1
+soundfile==0.12.1
+
+# AI/ML Models
+openai-whisper==20231117
+torch==2.1.2
+transformers==4.37.0
+
+# Wav2Vec2 for Pronunciation
+torchaudio==2.1.2
+
+# NLP & Text Processing
+nltk==3.8.1
+Levenshtein==0.23.0
+textdistance==4.6.1
+
+# Optional: For better speech recognition
+google-cloud-speech==2.23.0  # Comment out if not using Google Cloud
