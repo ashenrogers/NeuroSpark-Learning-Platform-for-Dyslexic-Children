@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dyslexia Letter Trainer</title>
+    <style>
+      body {
+        font-family: Arial;
+        text-align: center;
+      }
+      canvas {
+        border: 2px solid black;
+      }
+      button,
+      select {
+        padding: 10px;
+        font-size: 16px;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Draw the Letter</h2>
+
+    <select id="expected">
+      <option value="">Select Letter</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+      <option>D</option>
+      <option>E</option>
+      <option>F</option>
+      <option>G</option>
+      <option>H</option>
+      <option>J</option>
+      <option>L</option>
+      <option>N</option>
+      <option>O</option>
+      <option>P</option>
+      <option>R</option>
+      <option>S</option>
+      <option>U</option>
+      <option>V</option>
+    </select>
+
+    <br /><br />
+
+    <canvas id="canvas" width="300" height="300"></canvas><br />
+
+    <button onclick="clearCanvas()">Clear</button>
+    <button onclick="predict()">Check</button>
+
+    <h3 id="result"></h3>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, 300, 300);
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 20;
+      ctx.lineCap = "round";
+
+      let draw = false;
+      canvas.onmousedown = () => (draw = true);
+      canvas.onmouseup = () => {
+        draw = false;
+        ctx.beginPath();
+      };
+      canvas.onmousemove = (e) => {
+        if (!draw) return;
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+      };
+
+      function clearCanvas() {
+        ctx.clearRect(0, 0, 300, 300);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, 300, 300);
+        document.getElementById("result").innerText = "";
+      }
+
+      async function predict() {
+        const expected = document.getElementById("expected").value;
+        if (!expected) {
+          alert("Select a letter first");
+          return;
+        }
+
+        const blob = await new Promise((r) => canvas.toBlob(r));
+        const fd = new FormData();
+        fd.append("image", blob);
+        fd.append("expected_letter", expected);
+
+        const res = await fetch("/predict", { method: "POST", body: fd });
+        const data = await res.json();
+
+        document.getElementById(
+          "result"
+        ).innerText = `Expected: ${data.expected}
+Predicted: ${data.predicted}
+Status: ${data.status}
+Orientation: ${data.orientation}
+Confidence: ${data.confidence}%`;
+      }
+    </script>
+  </body>
+</html>
