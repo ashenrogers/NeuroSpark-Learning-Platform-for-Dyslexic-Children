@@ -1,0 +1,45 @@
+# --------------------
+# Environments
+# --------------------
+venv/
+ml_env/
+.env
+.env.*
+
+# --------------------
+# Python
+# --------------------
+__pycache__/
+*.pyc
+
+# --------------------
+# ML Models
+# --------------------
+model/
+models/
+*.h5
+quickdraw_hr/
+
+# --------------------
+# Backend assets
+# --------------------
+backend/img/
+
+# --------------------
+# Frontend generated assets
+# --------------------
+frontend/assets/morph_frames/
+frontend/assets/morph/
+frontend/assets/images/
+frontend/assets/icon.png
+
+# --------------------
+# Flutter / Dart
+# --------------------
+.dart_tool/
+build/
+
+# --------------------
+# Editor
+# --------------------
+.vscode/

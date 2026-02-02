@@ -1,70 +1,62 @@
-# 📱 Dyslexia Support Mobile Application
+# Adaptive Memory Trainer 🧠📱
 
-A comprehensive mobile application designed to help children with dyslexia improve their reading, pronunciation, and vocabulary skills using AI-powered speech recognition and natural language processing.
+Adaptive Memory Trainer is a cross-platform mobile application designed to enhance memory and cognitive skills in children with learning difficulties in **dyslexia**  
+The system combines **interactive memory games**, **adaptive difficulty**, and **physiological feedback** to deliver a personalized training experience.
 
-## 🎯 Project Overview
+This project is developed as an **academic research and software engineering project**, integrating mobile development, backend services, and AI-assisted components.
 
-This application is part of a Bachelor's degree research component, focusing on leveraging AI/ML technology to support children with learning difficulties. The app provides three interactive games:
+---
 
-1. **Reading Fluency Game** - Practice reading sentences with real-time feedback
-2. **Pronunciation Practice** - Learn correct word pronunciation with AI verification
-3. **Vocabulary Builder** - Expand vocabulary through AI-generated questions
+## 🎯 Objectives
 
-## 🏗️ Architecture
+- Improve short-term and working memory through game-based learning
+- Adapt game difficulty based on user performance and physiological signals
+- Provide a clean, distraction-free UI suitable for children
+- Store and analyze gameplay performance securely
 
-### Frontend (Flutter)
-- **Framework**: Flutter (latest stable)
-- **Language**: Dart (null-safe)
-- **Platform**: Android (with iOS compatibility)
-- **Key Features**:
-  - Audio recording and playback
-  - Real-time speech recognition
-  - Interactive UI with visual feedback
-  - Progress tracking
+---
 
-### Backend (Python FastAPI)
-- **Framework**: FastAPI
-- **Language**: Python 3.9+
-- **AI/ML Models**:
-  - Whisper (speech recognition)
-  - Google Speech Recognition
-  - Custom NLP models for text analysis
-  - Levenshtein distance for similarity
-- **Key Features**:
-  - RESTful API
-  - Audio file processing
-  - Real-time transcription
-  - AI-powered question generation
+## 🧩 Key Features
+
+- 🎮 Multiple memory-training games
+- 📈 Adaptive difficulty adjustment
+- 🗣️ Voice-assisted interactions
+- ❤️ Stress estimation using heart-rate data
+- 🏆 Leaderboard and score tracking
+- ☁️ Backend API for persistent data storage
+
+---
+
+## 🎮 Implemented Games
+
+- **Cosmic Sequence** – Pattern and sequence recall
+- **Digit Memory Matrix** – Numeric memory challenge
+- **Morph Memory Game** – Shape-morphing visual recall using generated stroke data
+
+---
+
+## 🛠️ Technology Stack
+
+### Frontend
+- Flutter (Dart)
+- Clean, child-friendly UI design
+- Android & cross-platform support
+
+### Backend
+- Python (Flask)
+- RESTful APIs
+- MongoDB (NoSQL database)
+
+### AI / Data
+- Generated visual morphing data
+- Adaptive logic (non-ML based difficulty adjustment)
+
+### IoT (Optional / Research Component)
+- ESP32
+- MAX30102 Heart Rate Sensor
+- 0.96" OLED display 
+
+---
 
 ## 📂 Project Structure
-
-```
-dyslexia-app/
-├── frontend/                   # Flutter mobile app
-│   ├── lib/
-│   │   ├── main.dart          # App entry point
-│   │   ├── screens/           # UI screens
-│   │   │   ├── home_screen.dart
-│   │   │   ├── fluency_game_screen.dart
-│   │   │   ├── pronunciation_game_screen.dart
-│   │   │   └── vocabulary_game_screen.dart
-│   │   ├── services/          # API services
-│   │   │   └── api_service.dart
-│   │   └── widgets/           # Reusable widgets
-│   │       ├── score_card.dart
-│   │       └── feedback_dialog.dart
-│   ├── android/               # Android-specific files
-│   └── pubspec.yaml          # Flutter dependencies
-│
-└── backend/                   # Python FastAPI server
-    ├── main.py               # API entry point
-    ├── models/               # AI/ML models
-    │   ├── speech_recognition_model.py
-    │   ├── fluency_checker.py
-    │   ├── pronunciation_checker.py
-    │   └── vocabulary_generator.py
-    ├── requirements.txt      # Python dependencies
-    └── .env.example         # Configuration template
-
-
 

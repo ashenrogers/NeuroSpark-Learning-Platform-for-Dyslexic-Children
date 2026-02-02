@@ -1,113 +1,153 @@
-import 'dart:io';
-import 'package:dio/dio.dart';
+// lib/services/api_service.dart
+import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'auth_service.dart';
+import 'bpm_manager.dart';
 
 class ApiService {
-  // Change this to your backend URL
-  static const String baseUrl = 'http://10.143.185.33:8000'; // Laptop IP
-  // For Android emulator, use: 'http://10.0.2.2:8000'
-  
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ),
+  static const String baseUrl = "http://172.20.10.4:5000/api";
+
+  static Future<Map<String, String>> _authHeaders() async {
+    final token = await AuthService.getToken();
+    final headers = {"Content-Type": "application/json"};
+    if (token != null && token.isNotEmpty) {
+      headers["Authorization"] = "Bearer $token";
+    }
+    return headers;
+  }
+
+  /// Save a game result. levelDurations: list of numbers (seconds)
+  static Future<bool> saveScore({
+  required String game,
+  required int score,
+  required double totalTime,
+  required List<double> levelDurations,
+  required int levelReached,
+}) async {
+  final url = Uri.parse("$baseUrl/save_score");
+  final headers = await _authHeaders();
+
+  final bpmMgr = BpmManager.instance;
+
+  final body = {
+    "game": game,
+    "score": score,
+    "total_time": totalTime,
+    "level_durations": levelDurations,
+    "level_reached": levelReached,
+
+    // ---- HR TELEMETRY (OPTIONAL, NULL-SAFE) ----
+    "avg_bpm": bpmMgr.averageBpm,
+    "baseline_bpm": bpmMgr.baselineBpm,
+    "stress_level":
+        bpmMgr.hasValidHrData ? bpmMgr.getStressLevel() : null,
+  };
+
+  final res = await http.post(
+    url,
+    headers: headers,
+    body: jsonEncode(body),
   );
 
-  // Reading Fluency Game
-  Future<Map<String, dynamic>> checkFluency({
-    required File audioFile,
-    required String expectedText,
-  }) async {
-    try {
-      FormData formData = FormData.fromMap({
-        'audio': await MultipartFile.fromFile(
-          audioFile.path,
-          filename: 'audio.wav',
-        ),
-        'expected_text': expectedText,
-      });
+  if (res.statusCode == 201) {
+    return true;
+  } else {
+    print("Save score failed: ${res.statusCode} ${res.body}");
+    return false;
+  }
+}
 
-      final response = await _dio.post(
-        '/api/fluency/check',
-        data: formData,
-      );
 
-      return response.data;
-    } catch (e) {
-      throw Exception('Fluency check failed: $e');
+  /// Get this user's scores (requires Authorization header)
+  static Future<List<dynamic>> getScores() async {
+    final url = Uri.parse("$baseUrl/get_scores");
+    final headers = await _authHeaders();
+    final res = await http.get(url, headers: headers);
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body) as List<dynamic>;
+    } else {
+      print("Get scores failed: ${res.statusCode} ${res.body}");
+      return [];
     }
   }
 
-  // Pronunciation Game
-  Future<Map<String, dynamic>> checkPronunciation({
-    required File audioFile,
-    required String word,
-  }) async {
-    try {
-      FormData formData = FormData.fromMap({
-        'audio': await MultipartFile.fromFile(
-          audioFile.path,
-          filename: 'audio.wav',
-        ),
-        'word': word,
-      });
-
-      final response = await _dio.post(
-        '/api/pronunciation/check',
-        data: formData,
-      );
-
-      return response.data;
-    } catch (e) {
-      throw Exception('Pronunciation check failed: $e');
+  /// Get a compact user score history for profile
+  static Future<List<dynamic>> getUserScores() async {
+    final url = Uri.parse("$baseUrl/user/scores");
+    final headers = await _authHeaders();
+    final res = await http.get(url, headers: headers);
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body) as List<dynamic>;
+    } else {
+      print("Get user scores failed: ${res.statusCode} ${res.body}");
+      return [];
     }
   }
 
-  // Vocabulary Game - Get Question
-  Future<Map<String, dynamic>> getVocabularyQuestion({
-    String difficulty = 'easy',
-  }) async {
-    try {
-      final response = await _dio.get(
-        '/api/vocabulary/question',
-        queryParameters: {'difficulty': difficulty},
-      );
+    /// Send a handwritten symbol image to the backend EMNIST model
+  static Future<Map<String, dynamic>?> predictHandwriting(String base64Image) async {
+  final url = Uri.parse("$baseUrl/handwriting_predict");
+  final headers = await _authHeaders();
 
-      return response.data;
-    } catch (e) {
-      throw Exception('Failed to get vocabulary question: $e');
+  final body = jsonEncode({
+    "image_base64": base64Image,
+  });
+
+  final res = await http.post(url, headers: headers, body: body);
+
+  try {
+    final Map<String, dynamic> data = jsonDecode(res.body);
+
+    // Normal success
+    if (res.statusCode == 200) {
+      return data;
     }
+
+    // Special case: backend detected a blank image and returns error=blank_image
+    if (res.statusCode == 400 && data["error"] == "blank_image") {
+      return data;
+    }
+
+    // Other errors
+    print("Handwriting predict failed: ${res.statusCode} ${res.body}");
+    return null;
+  } catch (e) {
+    print("Handwriting predict JSON decode error: $e, body=${res.body}");
+    return null;
+  }
+}
+
+
+/// ===============================
+/// MNIST DIGIT VALIDATION (NEW GAME)
+/// ===============================
+Future<Map<String, dynamic>> validateDigit({
+  required String base64Image,
+  required int expectedDigit,
+}) async {
+  final token = await AuthService.getToken();
+  if (token == null) throw Exception("Not authenticated");
+
+  final response = await http.post(
+    Uri.parse("$baseUrl/digit_validate"), // ✅ FIXED
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+    body: jsonEncode({
+      "image_base64": base64Image,
+      "expected_digit": expectedDigit,
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception("Digit validation failed");
   }
 
-  // Vocabulary Game - Check Answer
-  Future<Map<String, dynamic>> checkVocabularyAnswer({
-    required String questionId,
-    required String answer,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/api/vocabulary/check',
-        data: {
-          'question_id': questionId,
-          'answer': answer,
-        },
-      );
+  return jsonDecode(response.body);
+}
 
-      return response.data;
-    } catch (e) {
-      throw Exception('Answer check failed: $e');
-    }
-  }
 
-  // Health check
-  Future<bool> checkConnection() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/health'));
-      return response.statusCode == 200;
-    } catch (e) {
-      return false;
-    }
-  }
+
+
 }

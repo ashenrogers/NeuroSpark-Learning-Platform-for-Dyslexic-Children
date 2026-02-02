@@ -1,4 +1,4 @@
-# dyslexia_support_app
+# frontend
 
 A new Flutter project.
 
