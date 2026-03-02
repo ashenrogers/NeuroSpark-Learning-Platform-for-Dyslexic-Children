@@ -40,22 +40,36 @@ class _MorphRecallScreenState extends State<MorphRecallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F7F9),
+      backgroundColor: const Color(0xFFF4F5F7), // Soft, low-glare background
       appBar: AppBar(
-        title: const Text("Recall Sequence"),
+        title: const Text(
+          "Recall Sequence",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: const Color(0xFF2D3142),
         actions: [
           TextButton(
             onPressed: reset,
             child: const Text(
               "Reset",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                color: Color(0xFF2D3142),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           )
         ],
       ),
       body: Column(
         children: [
-          // ===== MEDICAL MONITORING STRIP (NON-OVERLAY) =====
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -75,27 +89,48 @@ class _MorphRecallScreenState extends State<MorphRecallScreen> {
               child: Column(
                 children: [
                   // Instruction Card
-                  Card(
-                    elevation: 1,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.blueAccent.withOpacity(0.3), 
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blueAccent.withOpacity(0.08),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.visibility,
-                              color: Colors.blueGrey),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              "Drag the icons into the exact order you saw.",
-                              style:
-                                  Theme.of(context).textTheme.titleMedium,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blueAccent.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.drag_indicator_rounded, size: 36, color: Colors.blueAccent),
+                        ),
+                        const SizedBox(width: 20),
+                        const Expanded(
+                          child: Text(
+                            "Drag the shapes into the correct order!",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              height: 1.4,
+                              letterSpacing: 0.5,
+                              color: Color(0xFF2D3142),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -154,11 +189,16 @@ class _MorphRecallScreenState extends State<MorphRecallScreen> {
                   const SizedBox(height: 12),
 
                   // Options
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Options",
-                      style: Theme.of(context).textTheme.titleMedium,
+                      "Shapes to choose from:",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF2D3142),
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -187,8 +227,16 @@ class _MorphRecallScreenState extends State<MorphRecallScreen> {
 
                   SizedBox(
                     width: double.infinity,
-                    height: 48,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4CAF50), // Friendly Green
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
                       onPressed: isComplete
                           ? () {
                               Navigator.pop(
@@ -197,7 +245,14 @@ class _MorphRecallScreenState extends State<MorphRecallScreen> {
                               );
                             }
                           : null,
-                      child: const Text("Submit"),
+                      child: const Text(
+                        "Submit",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
                     ),
                   )
                 ],
@@ -219,15 +274,16 @@ class _OptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: elevated ? 4 : 0,
-      borderRadius: BorderRadius.circular(12),
+      elevation: elevated ? 6 : 0,
+      shadowColor: Colors.black26,
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: 72,
-        height: 72,
-        padding: const EdgeInsets.all(10),
+        width: 80,
+        height: 80,
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black12),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.blueAccent.withOpacity(0.2), width: 2),
           color: Colors.white,
         ),
         child: Image.asset(icon, fit: BoxFit.contain),
