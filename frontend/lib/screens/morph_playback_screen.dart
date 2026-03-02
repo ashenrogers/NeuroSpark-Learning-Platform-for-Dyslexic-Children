@@ -127,7 +127,7 @@ class _MorphPlaybackScreenState extends State<MorphPlaybackScreen> {
             widget.pairs.length;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF4F5F7), // Soft, low-glare background
       body: Stack(
         children: [
           // ===== MORPH ANIMATION (CENTER) =====
@@ -164,13 +164,21 @@ class _MorphPlaybackScreenState extends State<MorphPlaybackScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                LinearProgressIndicator(value: progress),
-                const SizedBox(height: 6),
+                LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: Colors.black12,
+                  color: const Color(0xFF4CAF50),
+                  minHeight: 8,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                const SizedBox(height: 10),
                 Text(
-                  "${safePair + 1} / ${widget.pairs.length}",
+                  "Shape ${safePair + 1} of ${widget.pairs.length}",
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black54,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3142),
+                    letterSpacing: 0.5,
                   ),
                 ),
               ],
