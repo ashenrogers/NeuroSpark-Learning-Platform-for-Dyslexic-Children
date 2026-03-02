@@ -51,15 +51,31 @@ class _MorphSequenceScreenState extends State<MorphSequenceScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Heart Rate Monitor Not Connected"),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xFFFAF9F6),
+        title: const Text(
+          "No Heart Sensor?",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
         content: const Text(
-          "You can continue playing. "
-          "Stress data will not be recorded for this session.",
+          "You can still play without it!\n\nWe just won't record your heart rate.",
+          style: TextStyle(
+            fontSize: 18,
+            height: 1.5,
+            letterSpacing: 0.5,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Proceed"),
+            child: const Text(
+              "OK",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -256,134 +272,138 @@ class _MorphSequenceScreenState extends State<MorphSequenceScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: const Color(0xFFF6F7F9),
-    appBar: AppBar(
-      title: const Text("Morph Memory Game"),
-    ),
-    body: Stack(
-      children: [
-        // ===== MAIN CONTENT =====
-        Padding(
-          padding: const EdgeInsets.all(16),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F5F7), // Soft, low-glare background
+      appBar: AppBar(
+        title: const Text(
+          "Morph Memory",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: const Color(0xFF2D3142),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // INTRO CARD
-              Card(
-                elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        "How this activity works",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        "You will see a sequence of shapes smoothly changing "
-                        "from one form to another.\n\n"
-                        "Watch carefully and remember the order in which the "
-                        "shapes appear.",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
+              const Text(
+                "How to Play",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF2D3142),
+                  letterSpacing: 1.0,
                 ),
               ),
+              const SizedBox(height: 24),
 
-              const SizedBox(height: 14),
-
-              // DIFFICULTY CARD
-              Card(
-                elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        "Difficulty progression",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "• The activity starts with a short sequence.\n"
-                        "• As you remember more correctly, the sequence becomes longer.\n"
-                        "• The shapes will change slightly faster at higher levels.\n\n"
-                        "There is no time pressure — just try your best.",
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
+              // Very simple, clear visual steps
+              _buildStepCard(
+                icon: Icons.change_circle_rounded,
+                iconColor: Colors.blueAccent,
+                text: "1. Watch the shapes change.",
               ),
-
-              const SizedBox(height: 14),
-
-              // HEART RATE INFO
-              Card(
-                elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Icon(Icons.favorite, color: Colors.redAccent),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          "If a heart-rate sensor is connected, the app will "
-                          "observe changes in heart rate during the activity.\n\n"
-                          "This helps us understand effort and focus. "
-                          "If the device is not connected, the game will still work normally.",
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              _buildStepCard(
+                icon: Icons.visibility_rounded,
+                iconColor: Colors.purpleAccent,
+                text: "2. Remember their order.",
+              ),
+              _buildStepCard(
+                icon: Icons.ads_click_rounded,
+                iconColor: Colors.orangeAccent,
+                text: "3. Put them back in place!",
               ),
 
               const Spacer(),
 
-              // START BUTTON
-              SizedBox(
-                height: 52,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text(
-                    "Start Activity",
-                    style: TextStyle(fontSize: 16),
+              // Large, clear, contrasting play button
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4CAF50), // Friendly Green
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  onPressed: _playNextLevel,
+                ),
+                onPressed: _playNextLevel,
+                child: const Text(
+                  "Start Game",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
                 ),
               ),
             ],
           ),
         ),
-      ],
-    ),
-  );
-}
+      ),
+    );
+  }
+
+  Widget _buildStepCard({
+    required IconData icon,
+    required Color iconColor,
+    required String text,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: iconColor.withOpacity(0.3), 
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: iconColor.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 36, color: iconColor),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                height: 1.4,
+                letterSpacing: 0.5,
+                color: Color(0xFF2D3142),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
 
   int _scoreExactPositions(List<String> correct, List<String> child) {
