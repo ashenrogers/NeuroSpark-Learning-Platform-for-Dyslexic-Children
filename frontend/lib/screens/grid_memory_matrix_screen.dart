@@ -26,16 +26,16 @@ class GridLevelConfig {
 
 /// 10-level difficulty plan
 const List<GridLevelConfig> kGridLevels = [
-  GridLevelConfig(3, 3.0, 1), // Level 1
-  GridLevelConfig(3, 2.5, 1), // Level 2
-  GridLevelConfig(3, 2.0, 1), // Level 3
-  GridLevelConfig(3, 2.0, 2), // Level 4
-  GridLevelConfig(4, 2.0, 2), // Level 5
-  GridLevelConfig(4, 1.5, 2), // Level 6
-  GridLevelConfig(4, 1.5, 3), // Level 7
-  GridLevelConfig(5, 1.5, 3), // Level 8
-  GridLevelConfig(5, 1.2, 3), // Level 9
-  GridLevelConfig(5, 1.0, 3), // Level 10 (max)
+  GridLevelConfig(2, 3.0, 1), // Level 1 (2x2)
+  GridLevelConfig(2, 2.0, 1), // Level 2 (2x2, faster)
+  GridLevelConfig(2, 1.5, 2), // Level 3 (2x2, 2 questions)
+  GridLevelConfig(3, 3.0, 1), // Level 4 (3x3)
+  GridLevelConfig(3, 2.0, 2), // Level 5 (3x3, faster & 2 q's)
+  GridLevelConfig(3, 1.5, 2), // Level 6
+  GridLevelConfig(4, 3.0, 2), // Level 7 (4x4)
+  GridLevelConfig(4, 2.0, 3), // Level 8
+  GridLevelConfig(5, 3.0, 3), // Level 9 (5x5)
+  GridLevelConfig(5, 2.0, 4), // Level 10 (max)
 ];
 
 class GridMemoryMatrixScreen extends StatefulWidget {
@@ -105,23 +105,39 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
 
 
   void _showHeartRateWarning() {
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: const Text("Heart Rate Monitor Not Connected"),
-      content: const Text(
-        "You can continue playing. "
-        "Physiological stress data will not be recorded for this session.",
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Proceed"),
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xFFFAF9F6),
+        title: const Text(
+          "No Heart Sensor?",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
         ),
-      ],
-    ),
-  );
-}
+        content: const Text(
+          "You can still play without it!\n\nWe just won't record your heart rate.",
+          style: TextStyle(
+            fontSize: 18,
+            height: 1.5,
+            letterSpacing: 0.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              "OK",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
 
   void _startNewRound() {
@@ -295,24 +311,34 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 16),
                   const Text(
-                    "Draw the symbol you remember",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                     "Draw the symbol.",
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF2D3142)),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Hint: It was '$expectedChar' in that cell.",
-                    style: TextStyle(color: Colors.grey[700], fontSize: 13),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Draw clearly on the black area below.\n"
-                    "White pen = your handwriting.",
-                    style: TextStyle(fontSize: 13),
-                    textAlign: TextAlign.center,
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.blueAccent.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      "Hint: It was '$expectedChar'",
+                      style: const TextStyle(
+                        fontSize: 22, 
+                        fontWeight: FontWeight.w700, 
+                        color: Colors.blueAccent,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 12),
+                  const Text(
+                    "Draw clearly below!",
+                    style: TextStyle(fontSize: 18, color: Colors.black54, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 16),
                   Expanded(
                     child: HandwritingPad(
                       onSubmit: (pngBytes) async {
@@ -403,38 +429,67 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
     final gridSize = _levelConfig.gridSize;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF4F5F7), // Soft background
       appBar: AppBar(
-        title: const Text("Grid Memory Matrix"),
+        title: const Text(
+          "Grid Memory",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         centerTitle: true,
+        foregroundColor: const Color(0xFF2D3142),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Level + status
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Level $_currentLevel / ${kGridLevels.length}",
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              // Level + status (Enlarged)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                Text(
-                  _roundInProgress
-                      ? (_showingGrid
-                          ? "Memorize the grid"
-                          : "Answer the question")
-                      : "Tap Start Round",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color:
-                        _roundInProgress ? Colors.deepPurple : Colors.grey[700],
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Level $_currentLevel",
+                      style: const TextStyle(
+                        fontSize: 20, 
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF2D3142),
+                      ),
+                    ),
+                    Text(
+                      _roundInProgress
+                          ? (_showingGrid
+                              ? "Memorize! 👀"
+                              : "Answer! ✍️")
+                          : "Ready",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: _roundInProgress ? Colors.deepPurpleAccent : Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
+              ),
+              const SizedBox(height: 24),
 
             // Grid display area
             Expanded(
@@ -453,37 +508,44 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-            // Start / Answer button
-            SizedBox(
-              width: size.width * 0.8,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (!_roundInProgress) {
-                    _startNewRound();
-                  } else if (!_showingGrid) {
-                    _startHandwritingForCurrentQuestion();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+              // Start / Answer button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (!_roundInProgress) {
+                      _startNewRound();
+                    } else if (!_showingGrid) {
+                      _startHandwritingForCurrentQuestion();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4CAF50), // Friendly Green
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(
+                    !_roundInProgress
+                        ? "Start Game"
+                        : _showingGrid
+                            ? "Memorizing..."
+                            : "Draw Answer",
+                    style: const TextStyle(
+                      fontSize: 26, 
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
                   ),
                 ),
-                child: Text(
-                  !_roundInProgress
-                      ? "Start Round"
-                      : _showingGrid
-                          ? "Memorizing..."
-                          : "Draw Answer",
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -521,9 +583,9 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
               child: Text(
                 _cellLabelForIndex(index),
                 style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF3F3D56),
+                  fontSize: 36, // Much larger font
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF2D3142),
                 ),
               ),
             ),
@@ -546,12 +608,17 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Center(
         child: Text(
           _questionText(),
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            fontSize: 28, 
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF2D3142),
+            height: 1.4,
+          ),
         ),
       ),
     );
@@ -564,14 +631,24 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFFD0D5FF)),
       ),
-      padding: const EdgeInsets.all(20),
-      child: const Center(
-        child: Text(
-          "When you tap Start, a grid of symbols will appear.\n\n"
-          "Memorize both the symbols and where they are.\n"
-          "Then you'll be asked about specific cells!",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 15),
+      padding: const EdgeInsets.all(24),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.grid_view_rounded, size: 60, color: Color(0xFF9FA8DA)),
+            SizedBox(height: 20),
+            Text(
+              "1. Look at the grid\n2. Remember the symbols\n3. Draw the answer!",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 22, 
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2D3142),
+                height: 1.5,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -674,8 +751,14 @@ class _HandwritingPadState extends State<HandwritingPad> {
             ),
             ElevatedButton.icon(
               onPressed: _submit,
-              icon: const Icon(Icons.check),
-              label: const Text("Submit"),
+              icon: const Icon(Icons.check, size: 28),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4CAF50),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              ),
+              label: const Text("Submit", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
