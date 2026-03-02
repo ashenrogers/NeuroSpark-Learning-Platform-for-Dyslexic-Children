@@ -29,10 +29,12 @@ class _MorphSequenceScreenState extends State<MorphSequenceScreen> {
   ];
 
   static const List<_LevelConfig> levels = [
-    _LevelConfig(3, 90, 350, 0.6),
-    _LevelConfig(4, 80, 300, 0.7),
-    _LevelConfig(5, 70, 250, 0.75),
-    _LevelConfig(6, 60, 200, 0.8),
+    _LevelConfig(1, 90, 450, 0.5),   // Level 1: 1 transition (2 shapes)
+    _LevelConfig(2, 85, 400, 0.6),   // Level 2: 2 transitions (3 shapes)
+    _LevelConfig(3, 80, 350, 0.6),   // Level 3: 3 transitions (4 shapes)
+    _LevelConfig(4, 75, 300, 0.7),   // Level 4: 4 transitions (5 shapes)
+    _LevelConfig(5, 70, 250, 0.75),  // Level 5: 5 transitions (6 shapes)
+    _LevelConfig(6, 60, 200, 0.8),   // Level 6: 6 transitions (7 shapes)
   ];
 
   @override
