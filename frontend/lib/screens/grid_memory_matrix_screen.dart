@@ -425,7 +425,6 @@ class _GridMemoryMatrixScreenState extends State<GridMemoryMatrixScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     final gridSize = _levelConfig.gridSize;
 
     return Scaffold(
