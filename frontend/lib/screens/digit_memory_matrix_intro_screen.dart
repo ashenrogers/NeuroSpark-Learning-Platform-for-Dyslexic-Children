@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/heart_rate_overlay.dart';
 import '../services/bpm_manager.dart';
 import 'digit_memory_matrix_screen.dart';
 
@@ -56,15 +55,31 @@ class _DigitMemoryMatrixIntroScreenState
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Heart Rate Monitor Not Connected"),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xFFFAF9F6),
+        title: const Text(
+          "No Heart Sensor?",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
         content: const Text(
-          "You can still play this game without a heart rate sensor.\n\n"
-          "Heart rate and stress insights will not be recorded.",
+          "You can still play without it!\n\nWe just won't record your heart rate.",
+          style: TextStyle(
+            fontSize: 18,
+            height: 1.5,
+            letterSpacing: 0.5,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Continue"),
+            child: const Text(
+              "OK",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -74,74 +89,91 @@ class _DigitMemoryMatrixIntroScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Digit Memory Matrix")),
+      backgroundColor: const Color(0xFFF4F5F7), // Soft, low-glare background
+      appBar: AppBar(
+        title: const Text(
+          "Memory Matrix",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: const Color(0xFF2D3142),
+      ),
       body: Stack(
         children: [
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 72, 20, 20),
+              padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
               child: FadeTransition(
                 opacity: _fadeAnim,
                 child: SlideTransition(
                   position: _slideAnim,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const Text(
                         "How to Play",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF2D3142),
+                          letterSpacing: 1.0,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
 
-                      _buildCard(
-                        icon: Icons.grid_on,
-                        title: "Memory Challenge",
-                        content:
-                            "Memorize the grid of digits shown on the screen.\n\n"
-                            "After a short time, the grid disappears and you must "
-                            "draw the digit from a specific position.",
+                      // Very simple, clear visual steps
+                      _buildStepCard(
+                        icon: Icons.grid_view_rounded,
+                        iconColor: Colors.blueAccent,
+                        text: "1. Look at the numbers.",
+                      ),
+                      _buildStepCard(
+                        icon: Icons.visibility_off_rounded,
+                        iconColor: Colors.purpleAccent,
+                        text: "2. Remember where they are.",
+                      ),
+                      _buildStepCard(
+                        icon: Icons.draw_rounded,
+                        iconColor: Colors.orangeAccent,
+                        text: "3. Draw the missing number!",
                       ),
 
-                      const SizedBox(height: 16),
-
-                      _buildCard(
-                        icon: Icons.favorite,
-                        title: "Heart Rate Tracking",
-                        content:
-                            "If a heart rate sensor is connected, your heart rate "
-                            "will be monitored during gameplay.\n\n"
-                            "This helps analyze focus, stress, and cognitive load "
-                            "while solving memory challenges.",
-                      ),
+                      const SizedBox(height: 10),
 
                       const Spacer(),
 
-                      Center(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
+                      // Large, clear, contrasting play button
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4CAF50), // Friendly Green
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    const DigitMemoryMatrixScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Start Game",
-                            style: TextStyle(fontSize: 16),
+                        ),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DigitMemoryMatrixScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Start Game",
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
                           ),
                         ),
                       ),
@@ -151,59 +183,56 @@ class _DigitMemoryMatrixIntroScreenState
               ),
             ),
           ),
-
-          // ❤️ HEART RATE OVERLAY — SAFE & NON-INTRUSIVE
-          const Positioned(
-            top: 5,
-            right: 5,
-            child: SafeArea(
-              child: HeartRateOverlay(),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildCard({
+  Widget _buildStepCard({
     required IconData icon,
-    required String title,
-    required String content,
+    required Color iconColor,
+    required String text,
   }) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: iconColor.withOpacity(0.3), 
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: iconColor.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 22),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 36, color: iconColor),
           ),
-          const SizedBox(height: 10),
-          Text(
-            content,
-            style: const TextStyle(fontSize: 15, height: 1.5),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                height: 1.4,
+                letterSpacing: 0.5,
+                color: Color(0xFF2D3142),
+              ),
+            ),
           ),
         ],
       ),
